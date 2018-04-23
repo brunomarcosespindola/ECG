@@ -1,10 +1,10 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-Name = '100m';
+%Name = '100m';
 %Name = '121m';
 %Name = '101m';
-%Name = '16265m';
+Name = '16265m';
 
 
 infoName = strcat(Name, '.info');
@@ -36,8 +36,8 @@ end
 
 load('filtros.mat');
 
-tam=length(val)/freqint(1,1); %calcula o tempo do sinal em segundos
-t=0:tam/length(val):tam-(tam/length(val));% cria vetor de tempo para utilizar nos plots
+time_signal_s=length(val)/freqint(1,1); %calcula o tempo do sinal em segundos
+t=0:time_signal_s/length(val):time_signal_s-(time_signal_s/length(val));% cria vetor de tempo para utilizar nos plots
 plot(t,val); % plot sinal original
 xlim([0 10])
 hold on
@@ -65,10 +65,12 @@ subplot(1,2,1)
 plot(t,val)
 xlim([0 4])
 title('sinal original')
+grid on;
 subplot(1,2,2)
 plot(t,cleanecg)
 xlim([0 4])
 title('sinal apos filtros')
+grid on;
 
 
 
@@ -77,27 +79,27 @@ title('sinal apos filtros')
 % [c,l] = wavedec(sumsin,3,'db2');
 % approx = appcoef(c,l,'db2');
 % [cd1,cd2,cd3] = detcoef(c,l,[1 2 3]);
-wavelet='db6';
-ordem=6; %deve ser colocado o valor correspondente a ordem da wavelet utilizada
+wavelet='db7';
+ordem=7; %deve ser colocado o valor correspondente a ordem da wavelet utilizada
 [a1,d1] = dwt(cleanecg,wavelet);
 a1=a1([ordem:end]); %retira amostras que foram colocadas pela dwt
 d1=d1([ordem:end]);
-t1=0:tam/length(a1):tam-(tam/length(a1));
+t1=0:time_signal_s/length(a1):time_signal_s-(time_signal_s/length(a1));
 
 [a2,d2] = dwt(a1,wavelet);
 a2=a2([ordem:end]);
 d2=d2([ordem:end]);
-t2=0:tam/length(a2):tam-(tam/length(a2));
+t2=0:time_signal_s/length(a2):time_signal_s-(time_signal_s/length(a2));
 
 [a3,d3] = dwt(a2,wavelet);
 a3=a3([ordem:end]);
 d3=d3([ordem:end]);
-t3=0:tam/length(a3):tam-(tam/length(a3));
+t3=0:time_signal_s/length(a3):time_signal_s-(time_signal_s/length(a3));
 
 % [a4,d4] = dwt(a3,'db6');
 % a4=a4([ordem:end]);
 % d4=d4([ordem:end]);
-% t4=0:tam/length(a4):tam-(tam/length(a4));
+% t4=0:time_signal_s/length(a4):time_signal_s-(time_signal_s/length(a4));
 
 %----------------------------------------------------------------
 
@@ -137,28 +139,75 @@ xlim([0 janela])
 
 
 d3_2=d3.^2; %plota o d3^2
-figure();
-plot(t3,d3_2);
-hold on
-title('d3^2')
+
 
 %% Encontra os picos
 [peak_y1, peak_x1] = findpeaks(d3_2);
 [m,n]=max(peak_y1);
 [peak_y, peak_x] = findpeaks(d3_2,'minpeakheight',m*0.03,'MinPeakDistance',3);
-taxa=(length(d3_2)/tam);
+taxa=(length(d3_2)/time_signal_s);
 peak_x = (peak_x./taxa)-1/taxa;
-plot(peak_x,peak_y,'x');
+
+
 
 %% analise dos intervalos-------------------------------------
 peak_aux = peak_x(2:end);
 interval = peak_aux - peak_x(1:end-1);
 bpm= (60./interval);
-figure()
-stem(bpm)
 
 Media_bpm= sum(bpm)/length(bpm)
 %figure()
 %plot(peak_x,peak_y,'x');
 %hold on
 %plot(t,y2);
+
+
+
+%% encontra picos sinal original
+
+[peak_y2, peak_x2] = findpeaks(cleanecg);
+[m2,n2]=max(peak_y2);
+[peak_y3, peak_x3] = findpeaks(cleanecg,'minpeakheight',m2*0.5,'MinPeakDistance',3);
+taxa2=(length(cleanecg)/time_signal_s);
+peak_x3 = (peak_x3./taxa2)-1/taxa2;
+
+
+%% analise dos intervalos picos sinal original-------------------------------------
+peak_aux2 = peak_x3(2:end);
+interval2 = peak_aux2 - peak_x3(1:end-1);
+bpm2= (60./interval2);
+
+Media_bpm_original= sum(bpm2)/length(bpm2)
+
+%% Plots comparando 
+figure()
+subplot(2,1,1)
+stem(bpm)
+xlabel('amostras')
+ylabel('BPM')
+grid on;
+title('Utilizando wavelet')
+subplot(2,1,2)
+stem(bpm2)
+xlabel('amostras')
+ylabel('BPM')
+title('Direto')
+grid on;
+
+figure();
+subplot(2,1,1)
+plot(peak_x3,peak_y3,'x');
+hold on;
+plot(t,cleanecg)
+title('original')
+grid on;
+hold off;
+subplot(2,1,2)
+plot(t3,d3_2);
+hold on
+title('d3^2')
+plot(peak_x,peak_y,'x');
+grid on;
+
+
+
