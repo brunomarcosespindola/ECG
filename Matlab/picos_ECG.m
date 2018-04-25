@@ -1,10 +1,10 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-%Name = '100m';
+Name = '100m';
 %Name = '121m';
 %Name = '101m';
-Name = '16265m';
+%Name = '16265m';
 
 
 infoName = strcat(Name, '.info');
@@ -32,7 +32,7 @@ for i = 1:size(val, 1)
 end
 
 
-%% 
+%% Filtragem inicial
 
 load('filtros.mat');
 
@@ -44,22 +44,23 @@ hold on
 y=filter(FIR_HP_300,[val zeros(1,150)]);%filtragem das frequencias menores que 0.5Hz FIR ordem 200
 y=y([151:end]);
 plot(t,y); % plot sinal filtrado
-y2=filter(filtro_IIR,y);%FILTRA 60Hz IIR ORDEM 16
-plot(t,y2); % plot sinal filtrado
+%y2=filter(filtro_IIR,y);%FILTRA 60Hz IIR ORDEM 16
+y2=y;
+%plot(t,y2); % plot sinal filtrado
 grid on;
 
-
-%% DENOISE
+%%DENOISE------------------------------
 %%%apply Wavelet Transform
-[C,L]=wavedec(y2,8,'db4');
+[C,L]=wavedec(y2,3,'sym5');
 %[d1,d2,d3,d4,d5,d6,d7,d8]=detcoef(C,L,[1,2,3,4,5,6,7,8]);
 % %%%Denoise 
 [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-cleanecg=wdencmp('gbl',C,L,'db4',8,thr,sorh,keepapp);
-plot(t,cleanecg) %plota sinal sem ruído
-legend('Original','Filtro Passa Altas','Filtro 60Hz','Denoised')
+cleanecg=wdencmp('gbl',C,L,'sym5',3,thr,sorh,keepapp);
+plot(t,cleanecg,'b') %plota sinal sem ruído
+legend('Original','Filtro Passa Altas','Denoised')
 plotbrowser('on');
 
+%% Plot comparação sinal filtrado com original----------------------------------------
 figure()
 subplot(1,2,1)
 plot(t,val)
@@ -141,7 +142,7 @@ xlim([0 janela])
 d3_2=d3.^2; %plota o d3^2
 
 
-%% Encontra os picos
+%% Encontra os picos R
 [peak_y1, peak_x1] = findpeaks(d3_2);
 [m,n]=max(peak_y1);
 [peak_y, peak_x] = findpeaks(d3_2,'minpeakheight',m*0.03,'MinPeakDistance',3);
@@ -163,7 +164,7 @@ Media_bpm= sum(bpm)/length(bpm)
 
 
 
-%% encontra picos sinal original
+%% encontra picos R sinal original
 
 [peak_y2, peak_x2] = findpeaks(cleanecg);
 [m2,n2]=max(peak_y2);
@@ -178,6 +179,11 @@ interval2 = peak_aux2 - peak_x3(1:end-1);
 bpm2= (60./interval2);
 
 Media_bpm_original= sum(bpm2)/length(bpm2)
+
+%% Encontra onda QeS
+
+%NÃO FUNCIONA AINDA
+[R1,TR1]  = findpeaks(- cleanecg, t, 'MinPeakHeight',0.05,'MinPeakDistance',0.05);
 
 %% Plots comparando 
 figure()
@@ -198,6 +204,7 @@ figure();
 subplot(2,1,1)
 plot(peak_x3,peak_y3,'x');
 hold on;
+plot(TR1,-R1,'v')%% ARRUMAR ISSO
 plot(t,cleanecg)
 title('original')
 grid on;
