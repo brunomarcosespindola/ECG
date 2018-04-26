@@ -143,13 +143,9 @@ d3_2=d3.^2; %plota o d3^2
 
 
 %% Encontra os picos R
-[peak_y1, peak_x1] = findpeaks(d3_2);
+[peak_y1, peak_x1] = findpeaks(d3_2,t3);
 [m,n]=max(peak_y1);
-[peak_y, peak_x] = findpeaks(d3_2,'minpeakheight',m*0.03,'MinPeakDistance',3);
-taxa=(length(d3_2)/time_signal_s);
-peak_x = (peak_x./taxa)-1/taxa;
-
-
+[peak_y, peak_x] = findpeaks(d3_2,t3,'minpeakheight',m*0.03,'MinPeakDistance',0.3);
 
 %% analise dos intervalos-------------------------------------
 peak_aux = peak_x(2:end);
@@ -165,26 +161,29 @@ Media_bpm= sum(bpm)/length(bpm)
 
 
 %% encontra picos R sinal original
-
-[peak_y2, peak_x2] = findpeaks(cleanecg);
+[peak_y2, peak_x2] = findpeaks(cleanecg,t);
 [m2,n2]=max(peak_y2);
-[peak_y3, peak_x3] = findpeaks(cleanecg,'minpeakheight',m2*0.5,'MinPeakDistance',3);
-taxa2=(length(cleanecg)/time_signal_s);
-peak_x3 = (peak_x3./taxa2)-1/taxa2;
+[peak_y3, peak_x3] = findpeaks(cleanecg,t,'minpeakheight',m2*0.5,'MinPeakDistance',0.3);
 
 
 %% analise dos intervalos picos sinal original-------------------------------------
-peak_aux2 = peak_x3(2:end);
+peak_aux2 = peak_x3(2:end);%%CORRIGIR
 interval2 = peak_aux2 - peak_x3(1:end-1);
 bpm2= (60./interval2);
 
 Media_bpm_original= sum(bpm2)/length(bpm2)
 
-%% Encontra onda QeS
+%% Encontra onda Q e S
 
-%NÃO FUNCIONA AINDA
-[R1,TR1]  = findpeaks(- cleanecg, t, 'MinPeakHeight',0.05,'MinPeakDistance',0.05);
+t_matrix=repmat(t,length(peak_x3),1);
+S=sum(t_matrix>peak_x3' & t_matrix<(peak_x3'+0.1));
+Q=sum(t_matrix<peak_x3' & t_matrix>(peak_x3'-0.1));
+%teste=sum(t_matrix==peak_x3');
+pos_S=find(S); 
+pos_Q=find(Q);
 
+[R1,TR1]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.3);
+[R2,TR2]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.3);
 %% Plots comparando 
 figure()
 subplot(2,1,1)
@@ -204,7 +203,8 @@ figure();
 subplot(2,1,1)
 plot(peak_x3,peak_y3,'x');
 hold on;
-plot(TR1,-R1,'v')%% ARRUMAR ISSO
+plot(TR1,-R1,'vg')%% marca onda S
+plot(TR2,-R2,'vb')%% marca onda Q
 plot(t,cleanecg)
 title('original')
 grid on;
