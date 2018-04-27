@@ -1,10 +1,10 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-Name = '100m';
+%Name = '100m';
 %Name = '121m';
 %Name = '101m';
-%Name = '16265m';
+Name = '16265m';
 
 
 infoName = strcat(Name, '.info');
@@ -176,14 +176,18 @@ Media_bpm_original= sum(bpm2)/length(bpm2)
 %% Encontra onda Q e S
 
 t_matrix=repmat(t,length(peak_x3),1);
-S=sum(t_matrix>peak_x3' & t_matrix<(peak_x3'+0.1));
-Q=sum(t_matrix<peak_x3' & t_matrix>(peak_x3'-0.1));
-%teste=sum(t_matrix==peak_x3');
+peak_x3_matrix= repmat(peak_x3',1,length(t));
+
+S=sum(t_matrix>peak_x3_matrix & t_matrix<(peak_x3_matrix+0.1));
+Q=sum(t_matrix<peak_x3_matrix & t_matrix>(peak_x3_matrix-0.1));
+
+
 pos_S=find(S); 
 pos_Q=find(Q);
 
-[R1,TR1]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.3);
-[R2,TR2]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.3);
+
+[R1,TR1]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.5);
+[R2,TR2]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.5);
 %% Plots comparando 
 figure()
 subplot(2,1,1)
