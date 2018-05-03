@@ -56,6 +56,7 @@ grid on;
 % %%%Denoise 
 [thr,sorh,keepapp]=ddencmp('den','wv',y2);
 cleanecg=wdencmp('gbl',C,L,'sym5',3,thr,sorh,keepapp);
+%cleanecg=val;
 plot(t,cleanecg,'b') %plota sinal sem ruído
 legend('Original','Filtro Passa Altas','Denoised')
 plotbrowser('on');
@@ -73,7 +74,9 @@ xlim([0 4])
 title('sinal apos filtros')
 grid on;
 
-
+coe_i = corrcoef(val,cleanecg);
+correlacao=abs(coe_i); 
+correlacao=correlacao(1,2)
 
 %% Realiza os 3 niveis de decomposicoes-----------------------------
 
@@ -142,12 +145,12 @@ xlim([0 janela])
 d3_2=d3.^2; %plota o d3^2
 
 
-%% Encontra os picos R
+%% Encontra os picos R do d3^2
 [peak_y1, peak_x1] = findpeaks(d3_2,t3);
 [m,n]=max(peak_y1);
 [peak_y, peak_x] = findpeaks(d3_2,t3,'minpeakheight',m*0.03,'MinPeakDistance',0.3);
 
-%% analise dos intervalos-------------------------------------
+% analise dos intervalos-------------------------------------
 peak_aux = peak_x(2:end);
 interval = peak_aux - peak_x(1:end-1);
 bpm= (60./interval);
@@ -160,20 +163,20 @@ Media_bpm= sum(bpm)/length(bpm)
 
 
 
-%% encontra picos R sinal original
+%% encontra picos R sinal Denoised
 [peak_y2, peak_x2] = findpeaks(cleanecg,t);
 [m2,n2]=max(peak_y2);
 [peak_y3, peak_x3] = findpeaks(cleanecg,t,'minpeakheight',m2*0.5,'MinPeakDistance',0.3);
 
 
-%% analise dos intervalos picos sinal original-------------------------------------
+% analise dos intervalos picos sinal original-------------------------------------
 peak_aux2 = peak_x3(2:end);%%CORRIGIR
 interval2 = peak_aux2 - peak_x3(1:end-1);
 bpm2= (60./interval2);
 
 Media_bpm_original= sum(bpm2)/length(bpm2)
 
-%% Encontra onda Q e S
+%% Encontra onda Q e S do sinal Denoised
 
 t_matrix=repmat(t,length(peak_x3),1);
 peak_x3_matrix= repmat(peak_x3',1,length(t));
@@ -186,29 +189,23 @@ pos_S=find(S);
 pos_Q=find(Q);
 
 
-[R1,TR1]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.5);
-[R2,TR2]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.5);
+[Sy,Sx]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.5);
+[Qy,Qx]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.5);
+
+Q_S=sum(Sx([1:length(Qx)])-Qx)/length(Qx);
+
+string = ['intervalo QS= ',num2str(Q_S*1000),' ms'];disp(string);
+
+
 %% Plots comparando 
-figure()
-subplot(2,1,1)
-stem(bpm)
-xlabel('amostras')
-ylabel('BPM')
-grid on;
-title('Utilizando wavelet')
-subplot(2,1,2)
-stem(bpm2)
-xlabel('amostras')
-ylabel('BPM')
-title('Direto')
-grid on;
+
 
 figure();
 subplot(2,1,1)
 plot(peak_x3,peak_y3,'x');
 hold on;
-plot(TR1,-R1,'vg')%% marca onda S
-plot(TR2,-R2,'vb')%% marca onda Q
+plot(Sx,-Sy,'vg')%% marca onda S
+plot(Qx,-Qy,'vb')%% marca onda Q
 plot(t,cleanecg)
 title('original')
 grid on;
@@ -219,6 +216,79 @@ hold on
 title('d3^2')
 plot(peak_x,peak_y,'x');
 grid on;
+
+
+
+
+
+%% encontra picos R sinal a1
+[peak_a1y, peak_a1x] = findpeaks(a1,t1);
+[m_a1,n_a1]=max(peak_a1y);
+[peak_a1y, peak_a1x] = findpeaks(a1,t1,'minpeakheight',m_a1*0.5,'MinPeakDistance',0.3);
+
+
+% analise dos intervalos picos sinal original-------------------------------------
+peak_aux_a1 = peak_a1x(2:end);
+interval_a1 = peak_aux_a1 - peak_a1x(1:end-1);
+bpm_a1= (60./interval_a1);
+
+Media_bpm_a1= sum(bpm_a1)/length(bpm_a1)
+
+
+figure()
+subplot(3,1,2)
+stem(bpm)
+xlabel('amostras')
+ylabel('BPM')
+grid on;
+title('Utilizando wavelet')
+subplot(3,1,1)
+stem(bpm2)
+xlabel('amostras')
+ylabel('BPM')
+title('Direto')
+grid on;
+subplot(3,1,3)
+stem(bpm_a1)
+xlabel('amostras')
+ylabel('BPM')
+title('calculado pelo a1')
+grid on;
+
+
+%% Encontra onda Q e S do sinal Denoised
+
+t1_matriz=repmat(t1,length(peak_a1x),1);
+peak_a1x_matriz= repmat(peak_a1x',1,length(t1));
+
+S_a1=sum(t1_matriz>peak_a1x_matriz & t1_matriz<(peak_a1x_matriz+0.1));
+Q_a1=sum(t1_matriz<peak_a1x_matriz & t1_matriz>(peak_a1x_matriz-0.1));
+
+
+pos_S_a1=find(S_a1); 
+pos_Q_a1=find(Q_a1);
+
+
+[Sy_a1,Sx_a1]  = findpeaks(- a1(pos_S_a1), t1(pos_S_a1),'MinPeakDistance',0.5);
+[Qy_a1,Qx_a1]  = findpeaks(- a1(pos_Q_a1), t1(pos_Q_a1),'MinPeakDistance',0.5);
+
+Q_S_a1=sum(Sx_a1([1:length(Qx_a1)])-Qx_a1)/length(Qx_a1);
+
+string = ['intervalo QS pelo a1= ',num2str(Q_S_a1*1000),' ms'];disp(string);
+
+
+figure()
+plot(t1,a1)
+hold on
+plot(t,cleanecg)
+plot(peak_a1x,peak_a1y,'x')
+title('a1');
+plot(Sx_a1,-Sy_a1.*0.1,'vg')%% marca onda S
+plot(Qx_a1,-Qy_a1.*0.1,'vb')%% marca onda Q
+hold off
+legend('a1','Denoised','R','S','Q')
+plotbrowser('on');
+
 
 
 
