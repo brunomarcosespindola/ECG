@@ -1,10 +1,10 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-%Name = '100m';
+Name = '100m';
 %Name = '121m';
 %Name = '101m';
-Name = '16265m';
+%Name = '16265m';
 
 
 infoName = strcat(Name, '.info');
@@ -57,11 +57,11 @@ grid on;
 [thr,sorh,keepapp]=ddencmp('den','wv',y2);
 cleanecg=wdencmp('gbl',C,L,'sym5',3,thr,sorh,keepapp);
 %cleanecg=val;
-plot(t,cleanecg,'b') %plota sinal sem ruído
+plot(t,cleanecg,'b') %plota sinal sem ruï¿½do
 legend('Original','Filtro Passa Altas','Denoised')
 plotbrowser('on');
 
-%% Plot comparação sinal filtrado com original----------------------------------------
+%% Plot comparaï¿½ï¿½o sinal filtrado com original----------------------------------------
 figure()
 subplot(1,2,1)
 plot(t,val)
@@ -283,8 +283,8 @@ hold on
 plot(t,cleanecg)
 plot(peak_a1x,peak_a1y,'x')
 title('a1');
-plot(Sx_a1,-Sy_a1.*0.1,'vg')%% marca onda S
-plot(Qx_a1,-Qy_a1.*0.1,'vb')%% marca onda Q
+plot(Sx_a1,-Sy_a1,'vg')%% marca onda S
+plot(Qx_a1,-Qy_a1,'vb')%% marca onda Q
 hold off
 legend('a1','Denoised','R','S','Q')
 plotbrowser('on');
