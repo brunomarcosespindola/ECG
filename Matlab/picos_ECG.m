@@ -1,10 +1,10 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-Name = '100m';
+%Name = '100m';
 %Name = '121m';
 %Name = '101m';
-%Name = '16265m';
+Name = '16265m';
 
 
 infoName = strcat(Name, '.info');
@@ -45,9 +45,13 @@ y=filter(FIR_HP_300,[val zeros(1,150)]);%filtragem das frequencias menores que 0
 y=y([151:end]);
 plot(t,y); % plot sinal filtrado
 %y2=filter(filtro_IIR,y);%FILTRA 60Hz IIR ORDEM 16
-y2=y;
 %plot(t,y2); % plot sinal filtrado
 grid on;
+
+%%FILTRO PB -- ELIMINA RUÍDO
+y2 = filtfilt(SOS_PB,G_PB,y);
+plot(t,y2)
+
 
 %%DENOISE------------------------------
 %%%apply Wavelet Transform
@@ -58,7 +62,7 @@ grid on;
 cleanecg=wdencmp('gbl',C,L,'sym5',3,thr,sorh,keepapp);
 %cleanecg=val;
 plot(t,cleanecg,'b') %plota sinal sem ruï¿½do
-legend('Original','Filtro Passa Altas','Denoised')
+legend('Original','Filtro Passa Altas','PB','Denoised')
 plotbrowser('on');
 
 %% Plot comparaï¿½ï¿½o sinal filtrado com original----------------------------------------
