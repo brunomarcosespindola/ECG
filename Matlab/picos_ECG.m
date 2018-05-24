@@ -2,8 +2,6 @@
 %% Tratamento entrada
 clc; clear all; close all;
 %Name = '100m';
-%Name = '121m';
-%Name = '101m';
 Name = '16265m';
 
 
@@ -39,9 +37,9 @@ load('filtros.mat');
 time_signal_s=length(val)/freqint(1,1); %calcula o tempo do sinal em segundos
 t=0:time_signal_s/length(val):time_signal_s-(time_signal_s/length(val));% cria vetor de tempo para utilizar nos plots
 plot(t,val); % plot sinal original
-xlim([0 10])
+xlim([0 30])
 hold on
-y=filter(FIR_HP_300,[val zeros(1,150)]);%filtragem das frequencias menores que 0.5Hz FIR ordem 200
+y=filter(FIR_HP_300,[val zeros(1,150)]);%filtragem das frequencias menores que 0.5Hz FIR ordem 300
 y=y([151:end]);
 plot(t,y); % plot sinal filtrado
 %y2=filter(filtro_IIR,y);%FILTRA 60Hz IIR ORDEM 16
@@ -65,7 +63,23 @@ plot(t,cleanecg,'b') %plota sinal sem ruï¿½do
 legend('Original','Filtro Passa Altas','PB','Denoised')
 plotbrowser('on');
 
-%% Plot comparaï¿½ï¿½o sinal filtrado com original----------------------------------------
+figure()
+subplot(2,1,1)
+plot(t,y);
+grid on
+xlim([0 3])
+xlabel('Segundos')
+ylabel('mV')
+title('Entrada do filtro passa-baixas')
+subplot(2,1,2)
+plot(t,y2)
+grid on
+xlim([0 3])
+title('Saída do filtro passa-baixas')
+xlabel('Segundos')
+ylabel('mV')
+
+%% Plot comparacao sinal filtrado com original----------------------------------------
 figure()
 subplot(1,2,1)
 plot(t,val)
@@ -146,13 +160,13 @@ title('d3')
 xlim([0 janela])
 
 
-d3_2=d3.^2; %plota o d3^2
+d3_2=d3.^2; 
 
 
 %% Encontra os picos R do d3^2
-[peak_y1, peak_x1] = findpeaks(d3_2,t3);
-[m,n]=max(peak_y1);
-[peak_y, peak_x] = findpeaks(d3_2,t3,'minpeakheight',m*0.03,'MinPeakDistance',0.3);
+
+m=max(d3_2);
+[peak_y, peak_x] = findpeaks(d3_2,t3,'minpeakheight',m*0.01,'MinPeakDistance',0.3);
 
 % analise dos intervalos-------------------------------------
 peak_aux = peak_x(2:end);
@@ -160,16 +174,11 @@ interval = peak_aux - peak_x(1:end-1);
 bpm= (60./interval);
 
 Media_bpm= sum(bpm)/length(bpm)
-%figure()
-%plot(peak_x,peak_y,'x');
-%hold on
-%plot(t,y2);
 
 
 
-%% encontra picos R sinal Denoised
-[peak_y2, peak_x2] = findpeaks(cleanecg,t);
-[m2,n2]=max(peak_y2);
+%% encontra picos R sinal PREPROCESSADO
+m2=max(cleanecg);
 [peak_y3, peak_x3] = findpeaks(cleanecg,t,'minpeakheight',m2*0.5,'MinPeakDistance',0.3);
 
 
@@ -180,21 +189,21 @@ bpm2= (60./interval2);
 
 Media_bpm_original= sum(bpm2)/length(bpm2)
 
-%% Encontra onda Q e S do sinal Denoised
+%% Encontra onda Q e S do sinal PREPROCESSADO
 
-t_matrix=repmat(t,length(peak_x3),1);
-peak_x3_matrix= repmat(peak_x3',1,length(t));
+t_matrix=repmat(t,length(peak_x3),1); %cria uma matriz de tamanho: length(peak_x3) x length(t) apenas repetindo o t
+peak_x3_matrix= repmat(peak_x3',1,length(t)); %cria uma matriz de tamanho: length(peak_x3') x length(t) apenas repetindo o peak_x3'
 
-S=sum(t_matrix>peak_x3_matrix & t_matrix<(peak_x3_matrix+0.1));
-Q=sum(t_matrix<peak_x3_matrix & t_matrix>(peak_x3_matrix-0.1));
-
-
-pos_S=find(S); 
-pos_Q=find(Q);
+S=sum(t_matrix>peak_x3_matrix & t_matrix<(peak_x3_matrix+0.3)); %localiza todas as amostras que estão no intervalo de 0,3s após cada onda R
+Q=sum(t_matrix<peak_x3_matrix & t_matrix>(peak_x3_matrix-0.3));%localiza todas as amostras que estão no intervalo de 0,3s antes de cada onda R
 
 
-[Sy,Sx]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.5);
-[Qy,Qx]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.5);
+pos_S=find(S); %pega a posição das amostras
+pos_Q=find(Q); %pega a posição das amostras
+
+
+[Sy,Sx]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.5); %encontra os picos S
+[Qy,Qx]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.5); %encontra os picos Q
 
 Q_S=sum(Sx([1:length(Qx)])-Qx)/length(Qx);
 
@@ -207,15 +216,17 @@ string = ['intervalo QS= ',num2str(Q_S*1000),' ms'];disp(string);
 figure();
 subplot(2,1,1)
 plot(peak_x3,peak_y3,'x');
+xlim([0 10])
 hold on;
 plot(Sx,-Sy,'vg')%% marca onda S
 plot(Qx,-Qy,'vb')%% marca onda Q
 plot(t,cleanecg)
-title('original')
+title('Complexo QRS no sinal pré-processado')
 grid on;
 hold off;
 subplot(2,1,2)
 plot(t3,d3_2);
+%xlim([0 30])
 hold on
 title('d3^2')
 plot(peak_x,peak_y,'x');
@@ -226,8 +237,7 @@ grid on;
 
 
 %% encontra picos R sinal a1
-[peak_a1y, peak_a1x] = findpeaks(a1,t1);
-[m_a1,n_a1]=max(peak_a1y);
+m_a1=max(a1);
 [peak_a1y, peak_a1x] = findpeaks(a1,t1,'minpeakheight',m_a1*0.5,'MinPeakDistance',0.3);
 
 
@@ -241,27 +251,26 @@ Media_bpm_a1= sum(bpm_a1)/length(bpm_a1)
 
 figure()
 subplot(3,1,2)
-stem(bpm)
-xlabel('amostras')
+stem(peak_x(2:end),bpm)
+xlabel('segundos')
 ylabel('BPM')
 grid on;
-title('Utilizando wavelet')
+title('Método da decomposição wavelet')
 subplot(3,1,1)
-stem(bpm2)
-xlabel('amostras')
+stem(peak_x3(2:end),bpm2)
+xlabel('segundos')
 ylabel('BPM')
-title('Direto')
+title('Método Direto')
 grid on;
 subplot(3,1,3)
-stem(bpm_a1)
-xlabel('amostras')
+stem(peak_a1x(2:end),bpm_a1)
+xlabel('segundos')
 ylabel('BPM')
 title('calculado pelo a1')
 grid on;
 
 
-%% Encontra onda Q e S do sinal Denoised
-
+%% Encontra onda Q e S do sinal a1
 t1_matriz=repmat(t1,length(peak_a1x),1);
 peak_a1x_matriz= repmat(peak_a1x',1,length(t1));
 
