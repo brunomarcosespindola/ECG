@@ -1,8 +1,10 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-%Name = '100m';
-Name = '16265m';
+%Name = '100m'; %arritmia, onda T negativa
+%Name = '16265m';% sinusal
+%Name ='16272m'; %sinusal
+Name ='16420m'; %sinusal 
 
 
 infoName = strcat(Name, '.info');
@@ -126,8 +128,8 @@ t3=0:time_signal_s/length(a3):time_signal_s-(time_signal_s/length(a3));
 %----------------------------------------------------------------
 
 
-%----------Plots das decomposicoes------------------------------
-%%
+%% ----------Plots das decomposicoes------------------------------
+%
 janela=5; %define o intervalo dos prints
 figure()
 subplot(3,2,1);
@@ -194,8 +196,8 @@ Media_bpm_original= sum(bpm2)/length(bpm2)
 t_matrix=repmat(t,length(peak_x3),1); %cria uma matriz de tamanho: length(peak_x3) x length(t) apenas repetindo o t
 peak_x3_matrix= repmat(peak_x3',1,length(t)); %cria uma matriz de tamanho: length(peak_x3') x length(t) apenas repetindo o peak_x3'
 
-S=sum(t_matrix>peak_x3_matrix & t_matrix<(peak_x3_matrix+0.3)); %localiza todas as amostras que estão no intervalo de 0,3s após cada onda R
-Q=sum(t_matrix<peak_x3_matrix & t_matrix>(peak_x3_matrix-0.3));%localiza todas as amostras que estão no intervalo de 0,3s antes de cada onda R
+S=sum(t_matrix>peak_x3_matrix & t_matrix<(peak_x3_matrix+0.15)); %localiza todas as amostras que estão no intervalo de 0,15s após cada onda R
+Q=sum(t_matrix<peak_x3_matrix & t_matrix>(peak_x3_matrix-0.15));%localiza todas as amostras que estão no intervalo de 0,15s antes de cada onda R
 
 
 pos_S=find(S); %pega a posição das amostras
@@ -205,9 +207,31 @@ pos_Q=find(Q); %pega a posição das amostras
 [Sy,Sx]  = findpeaks(- cleanecg(pos_S), t(pos_S),'MinPeakDistance',0.5); %encontra os picos S
 [Qy,Qx]  = findpeaks(- cleanecg(pos_Q), t(pos_Q),'MinPeakDistance',0.5); %encontra os picos Q
 
-Q_S=sum(Sx([1:length(Qx)])-Qx)/length(Qx);
+Q_S=sum(Sx([1:length(Qx)])-Qx)/length(Qx); %calcula tempo do intervalo QS
 
 string = ['intervalo QS= ',num2str(Q_S*1000),' ms'];disp(string);
+
+%% Encontra ondas P e T
+Qx_matrix= repmat(Qx',1,length(t));
+Sx_matrix= repmat(Sx',1,length(t));
+
+media_Intervalo_QQ=median(interval2);
+
+intervalo_P=sum(t_matrix<Qx_matrix & t_matrix>(Qx_matrix - (media_Intervalo_QQ/2)));
+intervalo_T=sum(t_matrix>Sx_matrix & t_matrix<(Sx_matrix + (media_Intervalo_QQ/2)));
+
+pos_P=find(intervalo_P);
+pos_T=find(intervalo_T);
+
+[Py,Px]  = findpeaks( cleanecg(pos_P), t(pos_P),'MinPeakDistance',0.5); %encontra os picos P
+[Ty,Tx]  = findpeaks( cleanecg(pos_T), t(pos_T),'MinPeakDistance',0.5); %encontra os picos T
+[Ty2,Tx2]  = findpeaks(-cleanecg(pos_T), t(pos_T),'MinPeakDistance',0.5); %encontra os picos T caso sejam negativos
+
+% if (median(Ty2)>median(Ty)) %verifica se a onda T é negativa
+%   Tx=Tx2;
+%   Ty=-Ty2;
+% end
+
 
 
 %% Plots comparando 
@@ -216,10 +240,13 @@ string = ['intervalo QS= ',num2str(Q_S*1000),' ms'];disp(string);
 figure();
 subplot(2,1,1)
 plot(peak_x3,peak_y3,'x');
-xlim([0 10])
+%xlim([0 10])
 hold on;
 plot(Sx,-Sy,'vg')%% marca onda S
 plot(Qx,-Qy,'vb')%% marca onda Q
+plot(Px, Py,'xk')%% marca onda P
+plot(Tx, Ty,'xr')%% marca onda T
+
 plot(t,cleanecg)
 title('Complexo QRS no sinal pré-processado')
 grid on;
@@ -271,37 +298,37 @@ grid on;
 
 
 %% Encontra onda Q e S do sinal a1
-t1_matriz=repmat(t1,length(peak_a1x),1);
-peak_a1x_matriz= repmat(peak_a1x',1,length(t1));
-
-S_a1=sum(t1_matriz>peak_a1x_matriz & t1_matriz<(peak_a1x_matriz+0.1));
-Q_a1=sum(t1_matriz<peak_a1x_matriz & t1_matriz>(peak_a1x_matriz-0.1));
-
-
-pos_S_a1=find(S_a1); 
-pos_Q_a1=find(Q_a1);
-
-
-[Sy_a1,Sx_a1]  = findpeaks(- a1(pos_S_a1), t1(pos_S_a1),'MinPeakDistance',0.5);
-[Qy_a1,Qx_a1]  = findpeaks(- a1(pos_Q_a1), t1(pos_Q_a1),'MinPeakDistance',0.5);
-
-Q_S_a1=sum(Sx_a1([1:length(Qx_a1)])-Qx_a1)/length(Qx_a1);
-
-string = ['intervalo QS pelo a1= ',num2str(Q_S_a1*1000),' ms'];disp(string);
-
-
-figure()
-plot(t1,a1)
-hold on
-plot(t,cleanecg)
-plot(peak_a1x,peak_a1y,'x')
-title('a1');
-plot(Sx_a1,-Sy_a1,'vg')%% marca onda S
-plot(Qx_a1,-Qy_a1,'vb')%% marca onda Q
-hold off
-legend('a1','Denoised','R','S','Q')
-plotbrowser('on');
-
+% t1_matriz=repmat(t1,length(peak_a1x),1);
+% peak_a1x_matriz= repmat(peak_a1x',1,length(t1));
+% 
+% S_a1=sum(t1_matriz>peak_a1x_matriz & t1_matriz<(peak_a1x_matriz+0.1));
+% Q_a1=sum(t1_matriz<peak_a1x_matriz & t1_matriz>(peak_a1x_matriz-0.1));
+% 
+% 
+% pos_S_a1=find(S_a1); 
+% pos_Q_a1=find(Q_a1);
+% 
+% 
+% [Sy_a1,Sx_a1]  = findpeaks(- a1(pos_S_a1), t1(pos_S_a1),'MinPeakDistance',0.5);
+% [Qy_a1,Qx_a1]  = findpeaks(- a1(pos_Q_a1), t1(pos_Q_a1),'MinPeakDistance',0.5);
+% 
+% Q_S_a1=sum(Sx_a1([1:length(Qx_a1)])-Qx_a1)/length(Qx_a1);
+% 
+% string = ['intervalo QS pelo a1= ',num2str(Q_S_a1*1000),' ms'];disp(string);
+% 
+% 
+% figure()
+% plot(t1,a1)
+% hold on
+% plot(t,cleanecg)
+% plot(peak_a1x,peak_a1y,'x')
+% title('a1');
+% plot(Sx_a1,-Sy_a1,'vg')%% marca onda S
+% plot(Qx_a1,-Qy_a1,'vb')%% marca onda Q
+% hold off
+% legend('a1','Denoised','R','S','Q')
+% plotbrowser('on');
+% 
 
 
 
