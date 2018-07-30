@@ -3,8 +3,8 @@
 clc; clear all; close all;
 %Name = '100m'; %arritmia, onda T negativa
 %Name = '16265m';% sinusal
-%Name ='16272m'; %sinusal
-Name ='16420m'; %sinusal 
+Name ='16272m'; %sinusal
+%Name ='16420m'; %sinusal 
 
 
 infoName = strcat(Name, '.info');
@@ -248,6 +248,8 @@ plot(Px, Py,'xk')%% marca onda P
 plot(Tx, Ty,'xr')%% marca onda T
 
 plot(t,cleanecg)
+legend('onda R','onda S','onda Q','onda P','onda T','sinal')
+plotbrowser('on');
 title('Complexo QRS no sinal pré-processado')
 grid on;
 hold off;
