@@ -1,9 +1,9 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-%Name = '100m'; %arritmia, onda T negativa
+Name = '100m'; %arritmia, onda T negativa
 %Name = '16265m';% sinusal
-Name ='16272m'; %sinusal
+%Name ='16272m'; %sinusal
 %Name ='16420m'; %sinusal 
 
 
@@ -37,7 +37,7 @@ load('filtros.mat');
 
 if (freqint(1,1)<200)  %realiza interpolação caso a frequencia de amostragem do sinal original seja baixa demais para a decomposição  
     r=3;
-    desloc=2.5;
+    desloc=2.4;
     sinal_original= interp(val,r);
     
 else
@@ -159,9 +159,15 @@ m2=max(a3_atenuado);
 % analise dos intervalos RR do a3_atenuado-------------------------------------
 peak_aux2 = peak_x(2:end);%%CORRIGIR
 intervalo = peak_aux2 - peak_x(1:end-1);
+figure()
+plot(peak_x(2:end),intervalo);
+title('intervalos de tempo RR')
+xlabel('Segundos')
+ylabel('RR (seg)')
+grid on;
 bpm= (60./intervalo);
 
-Media_bpm_original= sum(bpm)/length(bpm)
+Media_bpm= sum(bpm)/length(bpm)
 
 %% Encontra onda Q e S do sinal PREPROCESSADO
 
