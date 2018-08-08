@@ -1,8 +1,16 @@
 %% Tratamento entrada
 clc; clear all; close all;
-%Name = '100m'; %arritmia, onda T negativa
+Name = '100m'; %arritmia, onda T negativa
 %Name = '101m'; %arritmia
-Name = '102m'; %arritmia
+%Name = '102m'; %arritmia
+%Name = '103m'; %arritmia
+%Name = '104m'; %arritmia
+%Name = '105m'; %arritmia
+%Name = '106m'; %arritmia
+%Name = '107m'; %arritmia
+%Name = '108m'; %arritmia
+%Name = '109m'; %arritmia
+
 %Name = '16265m';% sinusal
 %Name ='16272m'; %sinusal
 %Name ='16420m'; %sinusal 
@@ -166,7 +174,7 @@ plot(peak_x(2:end),intervalo);
 title('intervalos de tempo RR')
 xlabel('Segundos')
 ylabel('RR (seg)')
-ylim([0.4 1])
+%ylim([0.4 1])
 grid on;
 bpm= (60./intervalo);
 
@@ -199,8 +207,8 @@ Sx_matriz= repmat(Sx',1,length(t3));
 
 media_Intervalo_QQ=median(intervalo);
 
-intervalo_P=sum(t_matriz_qx<Qx_matriz & t_matriz_qx>(Qx_matriz - (media_Intervalo_QQ/2)));
-intervalo_T=sum(t_matriz_sx>Sx_matriz & t_matriz_sx<(Sx_matriz + (media_Intervalo_QQ/2)));
+intervalo_P=sum(t_matriz_qx<Qx_matriz & t_matriz_qx>(Qx_matriz - (media_Intervalo_QQ/3)));
+intervalo_T=sum(t_matriz_sx>Sx_matriz & t_matriz_sx<(Sx_matriz + (media_Intervalo_QQ/3)));
 
 pos_P=find(intervalo_P);
 pos_T=find(intervalo_T);
