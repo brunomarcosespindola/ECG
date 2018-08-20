@@ -2,7 +2,7 @@ clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
 %Name = '101m'; %arritmia
 % Name = '102m'; %arritmia
- Name = '103m'; %arritmia
+Name = '103m'; %arritmia
 % Name = '104m'; %arritmia
 % Name = '105m'; %arritmia
 % Name = '106m'; %arritmia
@@ -72,24 +72,74 @@ y3 = filtfilt(SOS_PB,G_PB,y); %FILTRAR COM O PB SEM PASSAR PELA DECOMPOSICAO
 y3_downsample = downsample(y3,4);
 t3_downsample=0:time_signal_s/length(y3_downsample):time_signal_s-(time_signal_s/length(y3_downsample));%cria vetor de tempo do downsampling
 
+
+
+
+%% DENOISE------------------------------
+%%%apply Wavelet Transform
+[C,L]=wavedec(y2,3,'sym5');
+%[d1,d2,d3,d4,d5,d6,d7,d8]=detcoef(C,L,[1,2,3,4,5,6,7,8]);
+% %%%Denoise 
+[thr,sorh,keepapp]=ddencmp('den','wv',y2);
+cleanecg=wdencmp('gbl',C,L,'sym5',3,thr,sorh,keepapp);
+%%
 % figure()
 % plot(t,y2)
 % hold on;
 % plot (t3_downsample,y3_downsample)
 
 %% plots
-% figure()
-% plot (t,y,'k')
-% hold on
-% plot (t,reconst,'b')
-% plotbrowser('on');
-% grid on;
-% plot(t,y2)
-% plot(t2_downsample,y2_downsample);
-% plot(t,y3);
-% legend('original','a3','a3 filtrado altas frequencias','downsampling a3 filtrado','sem wavelet')
-% xlim([0 10])
-% ylim([min(y) max(y)])
+figure()
+plot (t,y,'k')
+hold on
+plot (t,reconst,'b')
+plotbrowser('on');
+grid on;
+plot(t,y2)
+plot(t2_downsample,y2_downsample);
+plot(t,y3);
+plot(t,cleanecg)
+legend('original','a3','a3 filtrado altas frequencias','downsampling a3 filtrado','sem wavelet','Denoised')
+xlim([0 10])
+ylim([min(y) max(y)])
+
+
+
+%% TRANSFORMADA DE FOURIER
+L=length(sinal_original);
+Fs=L/time_signal_s;
+T=1/Fs;
+Y=fft(sinal_original);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+figure()
+subplot(2,1,1)
+plot(f,P1)
+grid on
+title('Espectro de frequencia do sinal original')
+xlim([0 100])
+ylim([0 0.08])
+%---------------------------------------------------------
+
+L=length(y3_downsample);
+Fs=L/time_signal_s;
+T=1/Fs;
+Y=fft(y3_downsample);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+subplot(2,1,2)
+plot(f,P1)
+grid on
+title('Espectro de frequencia do sinal pre-processado PA+PB')
+xlim([0 100])
 
 %% Encontra picos R sinal y3_downsample
 
@@ -177,7 +227,6 @@ clear t3_matrix_T; clear T_matrix;
 %% plot
 figure()
 % PLOT
-
 subplot(2,1,1)
 plot(t3_downsample,y3_downsample,'b');
 hold on;
