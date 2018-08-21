@@ -11,7 +11,7 @@ Name = '103m'; %arritmia
 % Name = '109m'; %arritmia
 %Name = '16265m';% sinusal
 %Name ='16272m'; %sinusal
-%Name ='16420m'; %sinusal 
+Name ='16420m'; %sinusal 
 
 infoName = strcat(Name, '.info');
 matName = strcat(Name, '.mat');
@@ -103,7 +103,42 @@ legend('original','a3','a3 filtrado altas frequencias','downsampling a3 filtrado
 xlim([0 10])
 ylim([min(y) max(y)])
 
+%% ----------Plots das decomposicoes------------------------------
+%
+t1=0:time_signal_s/length(a1):time_signal_s-(time_signal_s/length(a1));
+t2=0:time_signal_s/length(a2):time_signal_s-(time_signal_s/length(a2));
+t3=0:time_signal_s/length(a3):time_signal_s-(time_signal_s/length(a3));
 
+janela=30; %define o intervalo dos prints
+figure()
+subplot(3,2,1);
+plot(t1,a1);
+title('a1')
+xlim([0 janela])
+subplot(3,2,2);
+plot(t1,d1);
+title('d1')
+xlim([0 janela])
+xlabel('Seconds')
+ylabel('Amplitude')
+
+subplot(3,2,3);
+plot(t2,a2);
+title('a2')
+xlim([0 janela])
+subplot(3,2,4);
+plot(t2,d2);
+title('d2')
+xlim([0 janela])
+
+subplot(3,2,5);
+plot(t3,a3);
+title('a3')
+xlim([0 janela])
+subplot(3,2,6);
+plot(t3,d3);
+title('d3')
+xlim([0 janela])
 
 %% TRANSFORMADA DE FOURIER
 L=length(sinal_original);
@@ -117,9 +152,10 @@ P1(2:end-1) = 2*P1(2:end-1);
 
 f = Fs*(0:(L/2))/L;
 figure()
-subplot(2,1,1)
+subplot(3,1,1)
 plot(f,P1)
 grid on
+
 title('Espectro de frequencia do sinal original')
 xlim([0 100])
 ylim([0 0.08])
@@ -135,11 +171,161 @@ P1 = P2(1:L/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
 
 f = Fs*(0:(L/2))/L;
-subplot(2,1,2)
+subplot(3,1,2)
 plot(f,P1)
 grid on
 title('Espectro de frequencia do sinal pre-processado PA+PB')
 xlim([0 100])
+ylim([0 0.08])
+
+%----------------------------
+
+L=length(cleanecg);
+Fs=L/time_signal_s;
+T=1/Fs;
+Y=fft(cleanecg);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+subplot(3,1,3)
+plot(f,P1)
+grid on
+title('Espectro de frequencia do sinal denoised wavelet')
+xlim([0 100])
+ylim([0 0.08])
+
+
+%% FFT das decomposições
+
+L=length(a1);
+Fs=L/time_signal_s;
+T=1/Fs;
+Y=fft(a1);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+figure()
+subplot(3,2,1)
+plot(f,P1)
+grid on
+
+title('Espectro de frequencia do a1')
+xlim([0 100])
+ylim([0 0.08])
+
+%---------------------
+
+L=length(d1);
+Fs=L/time_signal_s;
+T=1/Fs;
+Y=fft(d1);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+
+subplot(3,2,2)
+plot(f,P1)
+grid on
+
+title('Espectro de frequencia do d1')
+xlim([0 100])
+ylim([0 0.08])
+
+%---------------------
+
+L=length(a2);
+Fs=L/time_signal_s;
+T=1/Fs;
+Y=fft(a2);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+
+subplot(3,2,3)
+plot(f,P1)
+grid on
+
+title('Espectro de frequencia do a2')
+xlim([0 100])
+ylim([0 0.08])
+
+%---------------------
+
+ L=length(d2);
+ Fs=L/time_signal_s;
+ T=1/Fs;
+Y=fft(d2);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+
+subplot(3,2,4)
+plot(f,P1)
+grid on
+
+title('Espectro de frequencia do d2')
+xlim([0 100])
+ylim([0 0.08])
+
+%---------------------
+
+ L=length(a3);
+ Fs=L/time_signal_s;
+ T=1/Fs;
+Y=fft(a3);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+
+subplot(3,2,5)
+plot(f,P1)
+grid on
+
+title('Espectro de frequencia do a3')
+xlim([0 100])
+ylim([0 0.08])
+
+%---------------------
+
+ L=length(d3);
+ Fs=L/time_signal_s;
+ T=1/Fs;
+Y=fft(d3);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+
+subplot(3,2,6)
+plot(f,P1)
+grid on
+
+title('Espectro de frequencia do d3')
+xlim([0 100])
+ylim([0 0.08])
+
+
+
 
 %% Encontra picos R sinal y3_downsample
 
