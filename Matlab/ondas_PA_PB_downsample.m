@@ -2,16 +2,16 @@ clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
 %Name = '101m'; %arritmia
 % Name = '102m'; %arritmia
-Name = '103m'; %arritmia
-% Name = '104m'; %arritmia
+%Name = '103m'; %arritmia
+ Name = '104m'; %arritmia
 % Name = '105m'; %arritmia
 % Name = '106m'; %arritmia
 % Name = '107m'; %arritmia
 % Name = '108m'; %arritmia
 % Name = '109m'; %arritmia
 %Name = '16265m';% sinusal
-%Name ='16272m'; %sinusal
-Name ='16420m'; %sinusal 
+%Name ='16272m'; %sinusal -possui um ruído forte no meio
+%Name ='16420m'; %sinusal 
 
 infoName = strcat(Name, '.info');
 matName = strcat(Name, '.mat');
@@ -335,6 +335,8 @@ m=max(y3_downsample);
 % analise dos intervalos RR do a3_atenuado-------------------------------------
 peak_aux2 = peak_x(2:end);
 intervalo = peak_aux2 - peak_x(1:end-1);
+media_RR_ms=mean(intervalo)
+variancia_RR=var(intervalo)
 figure()
 plot(peak_x(2:end),intervalo);
 title('intervalos de tempo RR')
