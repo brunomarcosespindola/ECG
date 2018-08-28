@@ -1,16 +1,16 @@
 clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
 %Name = '101m'; %arritmia
-% Name = '102m'; %arritmia
-%Name = '103m'; %arritmia
-%Name = '104m'; %arritmia
-% Name = '105m'; %arritmia
-% Name = '106m'; %arritmia
-% Name = '107m'; %arritmia
-% Name = '108m'; %arritmia
-% Name = '109m'; %arritmia
+%Name = '102m'; %arritmia
+Name = '103m'; %arritmia
+Name = '104m'; %arritmia
+Name = '105m'; %arritmia
+ %Name = '106m'; %arritmia TRAVA O ALGORITMO
+Name = '107m'; %arritmia
+Name = '108m'; %arritmia
+Name = '109m'; %arritmia
 %Name = '16265m';% sinusal
-Name ='16272m'; %sinusal -possui um ruído forte no meio
+%Name ='16272m'; %sinusal -possui um ruído forte no meio
 %Name ='16420m'; %sinusal 
 
 infoName = strcat(Name, '.info');
@@ -429,10 +429,12 @@ Media_bpm= sum(bpm)/length(bpm)
 %--------------------
 intervalo_aux= intervalo(2:end);
 dif_intervalo=intervalo_aux - intervalo(1:end-1);
-figure()
-stem(intervalo)
-figure()
-stem(dif_intervalo)
+t_dif=peak_x(3:end);
+
+pontos_de_alerta=find(dif_intervalo>0.1)
+
+alerta=t_dif(pontos_de_alerta-1);
+
 %% Encontra onda Q e S do sinal PREPROCESSADO
 
 t_matriz=repmat(t3_downsample,length(peak_x),1); %cria uma matriz de tamanho: length(peak_x) x length(t3) apenas repetindo o t3
@@ -514,6 +516,9 @@ plot(t3_downsample(posicao_Q), y3_downsample(posicao_Q),'vb')% marca onda Q
 plot(t3_downsample(posicao_R), y3_downsample(posicao_R),'x')% marca onda R
 plot(t3_downsample(posicao_S), y3_downsample(posicao_S),'vg')% marca onda S
 plot(t3_downsample(posicao_T), y3_downsample(posicao_T),'xr')% marca onda T
+y_alerta=repmat(m/2,1,length(alerta));
+text(alerta,y_alerta,'Alerta')
+
 
 subplot(2,1,2)
 plot(t,y,'b');
