@@ -3,14 +3,14 @@ Name = '100m'; %arritmia, onda T negativa
 %Name = '101m'; %arritmia
 % Name = '102m'; %arritmia
 %Name = '103m'; %arritmia
- Name = '104m'; %arritmia
+%Name = '104m'; %arritmia
 % Name = '105m'; %arritmia
 % Name = '106m'; %arritmia
 % Name = '107m'; %arritmia
 % Name = '108m'; %arritmia
 % Name = '109m'; %arritmia
 %Name = '16265m';% sinusal
-%Name ='16272m'; %sinusal -possui um ruído forte no meio
+Name ='16272m'; %sinusal -possui um ruído forte no meio
 %Name ='16420m'; %sinusal 
 
 infoName = strcat(Name, '.info');
@@ -77,12 +77,91 @@ t3_downsample=0:time_signal_s/length(y3_downsample):time_signal_s-(time_signal_s
 
 %% DENOISE------------------------------
 %%%apply Wavelet Transform
-[C,L]=wavedec(y2,3,'sym5');
+[C,L]=wavedec(y2,1,'sym5');
 %[d1,d2,d3,d4,d5,d6,d7,d8]=detcoef(C,L,[1,2,3,4,5,6,7,8]);
 % %%%Denoise 
 [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-cleanecg=wdencmp('gbl',C,L,'sym5',3,thr,sorh,keepapp);
+cleanecg=wdencmp('gbl',C,L,'sym5',1,thr,sorh,keepapp);
+
+%% Comparação entre denoiseds
+% wavelet='db1';
+% ord=3;
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% clean1=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% wavelet='db2';
+% 
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% clean2=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% wavelet='db3';
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% clean3=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% wavelet='db4';
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% clean4=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% wavelet='db5';
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% clean5=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% wavelet='db6';
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% clean6=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% figure()
+% plot (t,y,'k')
+% hold on
+% plot (t,clean1)
+% plot (t,clean2)
+% plot (t,clean3)
+% plot (t,clean4)
+% plot (t,clean5)
+% plot (t,clean6)
+% plotbrowser('on');
+% grid on;
+% xlim([0 10])
+
 %%
+% wavelet='db4';
+% ord=3;
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% compara1=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% wavelet='sym4';
+% ord=3;
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% compara2=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% wavelet='haar';
+% ord=3;
+% [C,L]=wavedec(y2,ord,wavelet);
+% [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+% compara3=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+% 
+% figure()
+% plot (t,y,'k')
+% hold on
+% plot (t,compara1)
+% plot (t,compara2)
+% plot (t,compara3)
+% plotbrowser('on');
+% grid on;
+% xlim([0 10])
+% 
+
+
+
+%% comparação entre original e subamostrado
 % figure()
 % plot(t,y2)
 % hold on;
@@ -332,7 +411,7 @@ ylim([0 0.08])
 m=max(y3_downsample);
 [peak_y, peak_x] = findpeaks(y3_downsample,t3_downsample,'minpeakheight',m*0.3,'MinPeakDistance',0.3);
 
-% analise dos intervalos RR do a3_atenuado-------------------------------------
+% analise dos intervalos RR
 peak_aux2 = peak_x(2:end);
 intervalo = peak_aux2 - peak_x(1:end-1);
 media_RR_ms=mean(intervalo)
@@ -347,6 +426,13 @@ bpm= (60./intervalo);
 
 Media_bpm= sum(bpm)/length(bpm)
 
+%--------------------
+intervalo_aux= intervalo(2:end);
+dif_intervalo=intervalo_aux - intervalo(1:end-1);
+figure()
+stem(intervalo)
+figure()
+stem(dif_intervalo)
 %% Encontra onda Q e S do sinal PREPROCESSADO
 
 t_matriz=repmat(t3_downsample,length(peak_x),1); %cria uma matriz de tamanho: length(peak_x) x length(t3) apenas repetindo o t3
@@ -377,10 +463,11 @@ Sx_matriz= repmat(Sx',1,length(t3_downsample));
 media_Intervalo_QQ=median(intervalo);
 
 intervalo_P=sum(t_matriz_qx<Qx_matriz & t_matriz_qx>(Qx_matriz - (media_Intervalo_QQ/3)));
-intervalo_T=sum(t_matriz_sx>(Sx_matriz + 0.05)& t_matriz_sx<(Sx_matriz + (media_Intervalo_QQ/3)));
+intervalo_T=sum(t_matriz_sx>(Sx_matriz + 0.10)& t_matriz_sx<(Sx_matriz + (media_Intervalo_QQ/2)));
 
 pos_P=find(intervalo_P);
 pos_T=find(intervalo_T);
+
 
 [Py,Px]  = findpeaks( (y3_downsample(pos_P)), t3_downsample(pos_P),'MinPeakDistance',0.5); %encontra os picos P
 [Ty,Tx]  = findpeaks( abs(y3_downsample(pos_T)), t3_downsample(pos_T),'MinPeakDistance',0.5); %encontra os picos T
