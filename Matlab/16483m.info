@@ -1,9 +1,9 @@
-Source: record mitdb/102
-val has 1 row (signal) and 21600 columns (samples/signal)
+Source: record nsrdb/16483  Start: [09:54:00.000]
+val has 1 row (signal) and 7680 columns (samples/signal)
 Duration:     1:00
-Sampling frequency: 360 Hz  Sampling interval: 0.002777777778 sec
+Sampling frequency: 128 Hz  Sampling interval: 0.0078125 sec
 Row	Signal	Gain	Base	Units
-1	V5	200	0	mV
+1	ECG1	200	0	mV
 
 To convert from raw units to the physical units shown
 above, call the 'rdmat.m' function from the wfdb-matlab

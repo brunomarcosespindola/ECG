@@ -2,16 +2,20 @@ clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
 %Name = '101m'; %arritmia
 %Name = '102m'; %arritmia
-Name = '103m'; %arritmia
-Name = '104m'; %arritmia
-Name = '105m'; %arritmia
- %Name = '106m'; %arritmia TRAVA O ALGORITMO
-Name = '107m'; %arritmia
-Name = '108m'; %arritmia
-Name = '109m'; %arritmia
+%Name = '103m'; %arritmia
+%Name = '104m'; %arritmia
+%Name = '105m'; %arritmia
+%Name = '106m'; %arritmia TRAVA O ALGORITMO
+%Name = '107m'; %arritmia
+%Name = '108m'; %arritmia
+%Name = '109m'; %arritmia
+%Name = '111m'; %arritmia
 %Name = '16265m';% sinusal
 %Name ='16272m'; %sinusal -possui um ruído forte no meio
-%Name ='16420m'; %sinusal 
+%Name ='16420m'; %sinusal
+Name ='16483m'; %sinusal
+
+%Name ='118e00m'; %NOISE STRESS
 
 infoName = strcat(Name, '.info');
 matName = strcat(Name, '.mat');
@@ -431,7 +435,7 @@ intervalo_aux= intervalo(2:end);
 dif_intervalo=intervalo_aux - intervalo(1:end-1);
 t_dif=peak_x(3:end);
 
-pontos_de_alerta=find(dif_intervalo>0.1)
+pontos_de_alerta=find(dif_intervalo>0.1);
 
 alerta=t_dif(pontos_de_alerta-1);
 
