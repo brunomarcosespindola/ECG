@@ -1,4 +1,4 @@
-clc; clear all; close all;
+%clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
 %Name = '101m'; %arritmia
 %Name = '102m'; %arritmia
@@ -13,7 +13,7 @@ Name = '100m'; %arritmia, onda T negativa
 %Name = '16265m';% sinusal
 %Name ='16272m'; %sinusal -possui um ruído forte no meio
 %Name ='16420m'; %sinusal
-Name ='16483m'; %sinusal
+%Name ='16483m'; %sinusal
 
 %Name ='118e00m'; %NOISE STRESS
 
@@ -56,6 +56,8 @@ t=0:time_signal_s/length(sinal_original):time_signal_s-(time_signal_s/length(sin
 y=filter(FIR_HP_300,[sinal_original zeros(1,150)]);%filtragem das frequencias menores que 0.5Hz FIR ordem 300
 y=y([151:end]);
 
+
+
 %% Decomposição, reconstrução, filtragem e downsampling
 wavelet='sym1';
 
@@ -75,9 +77,36 @@ t2_downsample=0:time_signal_s/length(y2_downsample):time_signal_s-(time_signal_s
 y3 = filtfilt(SOS_PB,G_PB,y); %FILTRAR COM O PB SEM PASSAR PELA DECOMPOSICAO
 y3_downsample = downsample(y3,4);
 t3_downsample=0:time_signal_s/length(y3_downsample):time_signal_s-(time_signal_s/length(y3_downsample));%cria vetor de tempo do downsampling
+%% FILTRO PB MUITO SELETIVO
+
+load('filtro_pf.mat');
+
+y_rejeita_faixa = filtfilt(SOS_2,G_2,y3_downsample);
+
+figure()
+plot (t3_downsample,y3_downsample)
+hold on
+plot (t3_downsample,y_rejeita_faixa)
 
 
 
+L=length(y_rejeita_faixa);
+Fs=L/time_signal_s;
+T=1/Fs;
+Y=fft(y_rejeita_faixa);
+
+P2 = abs(Y/L);
+P1 = P2(1:L/2+1);
+P1(2:end-1) = 2*P1(2:end-1);
+
+f = Fs*(0:(L/2))/L;
+figure()
+plot(f,P1)
+grid on
+
+title('Espectro de frequencia do FILTRO')
+% xlim([0 100])
+% ylim([0 0.08])
 
 %% DENOISE------------------------------
 %%%apply Wavelet Transform
