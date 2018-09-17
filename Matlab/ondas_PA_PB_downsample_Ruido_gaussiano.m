@@ -1,6 +1,6 @@
 clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
-%Name = '101m'; %arritmia
+Name = '101m'; %arritmia
 %Name = '102m'; %arritmia
 %Name = '103m'; %arritmia
 %Name = '104m'; %arritmia
@@ -11,10 +11,10 @@ Name = '100m'; %arritmia, onda T negativa
 %Name = '109m'; %arritmia
 %Name = '111m'; %arritmia
 %Name = '16265m';% sinusal
-%Name ='16272m'; %sinusal -possui um ruído forte no meio
-%Name ='16420m'; %sinusal
-%Name ='16483m'; %sinusal
-%Name ='16539m'; %sinusal
+Name ='16272m'; %sinusal -possui um ruído forte no meio
+Name ='16420m'; %sinusal
+Name ='16483m'; %sinusal
+Name ='16539m'; %sinusal
 %Name ='118e00m'; %NOISE STRESS
 
 %snr = 100;
@@ -76,7 +76,7 @@ for snr=51:-5:1
     % energia ajustada do ruido
     er = sum(r.^2);
     % SNR
-    10*log10(es/er)
+    snr_atual(cont)=10*log10(es/er);
     % sinal resultante
     y_ruido = sinal_original + r;
     
@@ -480,10 +480,10 @@ for snr=51:-5:1
     % analise dos intervalos RR
     peak_aux2 = peak_x(2:end);
     intervalo = peak_aux2 - peak_x(1:end-1);
-    media_RR_s(cont)=mean(intervalo)
+    media_RR_s(cont)=mean(intervalo);
     bpm= (60./intervalo);
-    Media_bpm(cont)= sum(bpm)/length(bpm)
-    variancia_RR(cont)=var(intervalo)
+    Media_bpm(cont)= sum(bpm)/length(bpm);
+    variancia_RR(cont)=var(intervalo);
     % figure()
     % plot(peak_x(2:end),intervalo);
     % title('intervalos de tempo RR')
@@ -503,7 +503,7 @@ for snr=51:-5:1
     
     alerta=t_dif(pontos_de_alerta-1);
     
-    n_alertas(cont)=length(alerta)
+    n_alertas(cont)=length(alerta);
     
     
     
@@ -528,7 +528,7 @@ for snr=51:-5:1
 %    Q_S=sum(Sx([1:length(Qx)])-Qx)/length(Qx); %calcula tempo do intervalo QS
     Q_S=sum(Sx - Qx([1:length(Sx)]))/length(Qx); %calcula tempo do intervalo QS
     %string = ['intervalo QS= ',num2str(Q_S*1000),' ms'];disp(string);
-    intervalo_QS_ms(cont)=Q_S*1000
+    intervalo_QS_ms(cont)=Q_S*1000;
     %% Encontra ondas P e T
     t_matriz_qx=repmat(t3_downsample,length(Qx),1);
     t_matriz_sx=repmat(t3_downsample,length(Sx),1);
@@ -605,3 +605,17 @@ for snr=51:-5:1
     plot(t(posicao_T*4 -2),y(posicao_T*4 -2), 'xr');% marca onda T
     %xlim([0 10])
 end
+%% 
+snr_atual
+media_RR_s
+Media_bpm
+variancia_RR
+intervalo_QS_ms
+n_alertas
+
+figure()
+plot(snr_atual,intervalo_QS_ms)
+title('intervalo QS')
+xlabel('snr')
+ylabel('ms')
+grid on;
