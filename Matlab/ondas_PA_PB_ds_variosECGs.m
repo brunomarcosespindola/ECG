@@ -3,11 +3,11 @@ clc; clear all; close all;
 % Name = '101m'; %arritmia
 %Name = '102m'; %arritmia
 %Name = '103m'; %arritmia
-%Name = '104m'; %arritmia
+%Name = '104m'; %arritmia-RUIM
 %Name = '105m'; %arritmia
 %Name = '106m'; %arritmia TRAVA O ALGORITMO
-%Name = '107m'; %arritmia
-%Name = '108m'; %arritmia
+%Name = '107m'; %arritmia-RUIM
+%Name = '108m'; %arritmia-RUIM
 %Name = '109m'; %arritmia
 %Name = '111m'; %arritmia
 % Name = '16265m';% sinusal
@@ -20,10 +20,12 @@ clc; clear all; close all;
 
 %% 
 Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
-
-
+%Name= {'16265m','16272m','16420m','16483m','16539m'};% arritmia
+%Name={'16420m'};
 
 resultados=struct();
+
+
 
 
 %%
@@ -330,8 +332,17 @@ subplot(2,1,2)
 plot(f,P1)
 grid on
 title(['Espectro de frequencia do sinal pre-processado PA+PB: ',resultados(cont).Name])
-xlim([0 100])
+xlim([0 50])
 ylim([0 0.08])
+
+
+%--------Comparação com sinal Sinusal
+
+load('sinusal_FFT.mat')
+% figure()
+% plot(sinusal_FFT.f(1:length(f)),sinusal_FFT.P(1:length(f)));
+corr=corrcoef(sinusal_FFT.P(1:length(f)),P1);
+resultados(cont).correlacao=corr(1,2);
 %
 % %----------------------------
 %
