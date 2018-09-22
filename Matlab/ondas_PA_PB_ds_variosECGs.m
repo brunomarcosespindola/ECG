@@ -5,7 +5,6 @@ clc; clear all; close all;
 %Name = '103m'; %arritmia
 %Name = '104m'; %arritmia-RUIM
 %Name = '105m'; %arritmia
-%Name = '106m'; %arritmia TRAVA O ALGORITMO
 %Name = '107m'; %arritmia-RUIM
 %Name = '108m'; %arritmia-RUIM
 %Name = '109m'; %arritmia
@@ -20,14 +19,11 @@ clc; clear all; close all;
 
 %% 
 Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
-%Name= {'16265m','16272m','16420m','16483m','16539m'};% arritmia
+%Name= {'16265m','16272m','16420m','16483m','16539m'};% sinusal
 %Name={'16420m'};
 
+
 resultados=struct();
-
-
-
-
 %%
 for cont=1:length(Name)
 
@@ -602,7 +598,7 @@ subplot(2,1,1)
 plot(t3_downsample,y3_downsample,'b');
 hold on;
 grid on;
-%xlim([0 10])
+xlim([0 10])
 title(['Sinal y3downsample: ',resultados(cont).Name])
 
 plot(t3_downsample(posicao_P), y3_downsample(posicao_P),'xk')% marca onda P
@@ -624,7 +620,7 @@ plot(t(posicao_Q*4 -2),y(posicao_Q*4 -2), 'vb');% marca onda Q
 plot(t(posicao_R*4 -2),y(posicao_R*4 -2), 'x');% marca onda R
 plot(t(posicao_S*4 -2),y(posicao_S*4 -2), 'vg');% marca onda S
 plot(t(posicao_T*4 -2),y(posicao_T*4 -2), 'xr');% marca onda T
-%xlim([0 10])
+xlim([0 10])
 end
 %%
 for ii=1:length(resultados)
