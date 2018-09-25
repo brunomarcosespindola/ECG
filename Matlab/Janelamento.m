@@ -18,10 +18,10 @@ clc; clear all; close all;
 
 
 %% 
-%Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
+Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
 %Name= {'16265m','16272m','16420m','16483m','16539m'};% sinusal
 %Name={'16420m'};
-Name={'100m30m','103m_30m'};
+Name={'103m_30m'};
 
 
 resultados=struct();
@@ -78,26 +78,6 @@ t3_downsample=0:time_signal_s/length(y3_downsample):time_signal_s-(time_signal_s
 
 
 %% TRANSFORMADA DE FOURIER
-% L=length(sinal_original);
-% Fs=L/time_signal_s;
-% T=1/Fs;
-% Y=fft(sinal_original);
-% 
-% P2 = abs(Y/L);
-% P1 = P2(1:L/2+1);
-% P1(2:end-1) = 2*P1(2:end-1);
-% 
-% f = Fs*(0:(L/2))/L;
-% figure()
-% subplot(2,1,1)
-% plot(f,P1)
-% grid on
-% title(['Espectro de frequencia do sinal: ',resultados(cont).Name])
-% xlim([0 100])
-% ylim([0 0.08])
-% %---------------------------------------------------------
-%
-
 
 L=length(y3_downsample);
 Fs=L/time_signal_s;
@@ -111,16 +91,16 @@ P1(2:end-1) = 2*P1(2:end-1);
 
 f = Fs*(0:(L/2))/L;
 %subplot(2,1,2)
-figure()
-plot(f,P1)
-grid on
-title(['Espectro de frequencia do sinal pre-processado PA+PB: ',resultados(cont).Name])
-xlim([0 50])
-ylim([0 0.08])
+% figure()
+% plot(f,P1)
+% grid on
+% title(['Espectro de frequencia do sinal pre-processado PA+PB: ',resultados(cont).Name])
+% xlim([0 50])
+% ylim([0 0.08])
 
 
 
-%--------Comparação com sinal Sinusal
+%--------Comparação em frequencia com sinal Sinusal 
 
 load('sinusal_FFT.mat')
  %figure()
@@ -273,13 +253,19 @@ t_dif=Rx_total(3:end);
 
 pontos_de_alerta=find(dif_intervalo>0.1);
 
-alerta=t_dif(pontos_de_alerta-1);
+alerta=t_dif(pontos_de_alerta -1);
 
 resultados(cont).n_alertas=length(alerta);
 %% ----------------INTERVALO QS
-
-%    Q_S=sum(Sx([1:length(Qx)])-Qx)/length(Qx); %calcula tempo do intervalo QS
-%Q_S=sum(Sx_total - Qx([1:length(Sx_total)]))/length(Qx_total); %calcula tempo do intervalo QS
+if (length(Sx_total)> length(Qx_total));
+    vetorQS=Sx_total([2:length(Qx_total)])-Qx_total;
+    % Q_S=sum(vetorQS)/length(Qx_total); %calcula tempo do intervalo QS
+else (length(Sx_total)< length(Qx_total));   
+       vetorQS=Sx_total - Qx_total([1:length(Sx_total)]);
+    % Q_S=sum(vetorQS)/length(Qx_total);     
+end
+resultados(cont).intervalo_QS_ms=median(vetorQS)*1000;
+resultados(cont).variancia_QS_ms=var(vetorQS);
 %string = ['intervalo QS= ',num2str(Q_S*1000),' ms'];disp(string);
 %resultados(cont).intervalo_QS_ms=Q_S*1000;
 
