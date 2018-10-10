@@ -1,6 +1,6 @@
 clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
-Name = '101m'; %arritmia
+%Name = '101m'; %arritmia
 %Name = '102m'; %arritmia
 %Name = '103m'; %arritmia
 %Name = '104m'; %arritmia
@@ -11,7 +11,7 @@ Name = '101m'; %arritmia
 %Name = '109m'; %arritmia
 %Name = '111m'; %arritmia
 %Name = '16265m';% sinusal
-Name ='16272m'; %sinusal -possui um ruído forte no meio
+%Name ='16272m'; %sinusal -possui um ruído forte no meio
 Name ='16420m'; %sinusal
 Name ='16483m'; %sinusal
 Name ='16539m'; %sinusal

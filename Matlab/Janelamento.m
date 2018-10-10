@@ -19,9 +19,9 @@ clc; clear all; close all;
 
 %% 
 Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
-%Name= {'16265m','16272m','16420m','16483m','16539m'};% sinusal
+Name= {'16265m','16272m','16420m','16483m','16539m'};% sinusal
 %Name={'16420m'};
-Name={'103m_30m'};
+%Name={'103m_30m'};
 
 
 resultados=struct();
@@ -151,10 +151,10 @@ Sx_matriz= repmat(Sx',1,length(t_janela));
 
 peak_aux2 = peak_x(2:end);
 intervalo = peak_aux2 - peak_x(1:end-1);
-media_Intervalo_QQ=median(intervalo);
+media_Intervalo_RR=median(intervalo);
 
-intervalo_P=sum(t_matriz_qx<Qx_matriz & t_matriz_qx>(Qx_matriz - (media_Intervalo_QQ/3)));
-intervalo_T=sum(t_matriz_sx>(Sx_matriz + 0.10)& t_matriz_sx<(Sx_matriz + (media_Intervalo_QQ/2)));
+intervalo_P=sum(t_matriz_qx<Qx_matriz & t_matriz_qx>(Qx_matriz - (media_Intervalo_RR/3)));
+intervalo_T=sum(t_matriz_sx>(Sx_matriz + 0.10)& t_matriz_sx<(Sx_matriz + (media_Intervalo_RR/2)));
 
 pos_P=find(intervalo_P);
 pos_T=find(intervalo_T);
@@ -275,16 +275,20 @@ figure()
 % PLOT
 subplot(2,1,1)
 plot(t3_downsample,y3_downsample,'b');
+xlabel('segundos')
+ylabel('mV')
 hold on;
 grid on;
-%xlim([0 10])
+
 title(['Sinal y3downsample: ',resultados(cont).Name])
 
 plot(t3_downsample(posicao_P), y3_downsample(posicao_P),'xk')% marca onda P
-plot(t3_downsample(posicao_Q), y3_downsample(posicao_Q),'vb')% marca onda Q
+plot(t3_downsample(posicao_Q), y3_downsample(posicao_Q),'vm')% marca onda Q
 plot(t3_downsample(posicao_R), y3_downsample(posicao_R),'x')% marca onda R
 plot(t3_downsample(posicao_S), y3_downsample(posicao_S),'vg')% marca onda S
 plot(t3_downsample(posicao_T), y3_downsample(posicao_T),'xr')% marca onda T
+legend('ECG','onda P','onda Q','onda R','onda S','onda T')
+xlim([2 8])
 y_alerta=repmat(m/2,1,length(alerta));
 text(alerta,y_alerta,'Alerta')
 
@@ -295,7 +299,7 @@ grid on;
 hold on;
 title('Marcacoes no sinal original')
 plot(t(posicao_P*4 -2),y(posicao_P*4 -2), 'xk');% marca onda P
-plot(t(posicao_Q*4 -2),y(posicao_Q*4 -2), 'vb');% marca onda Q
+plot(t(posicao_Q*4 -2),y(posicao_Q*4 -2), 'vm');% marca onda Q
 plot(t(posicao_R*4 -2),y(posicao_R*4 -2), 'x');% marca onda R
 plot(t(posicao_S*4 -2),y(posicao_S*4 -2), 'vg');% marca onda S
 plot(t(posicao_T*4 -2),y(posicao_T*4 -2), 'xr');% marca onda T

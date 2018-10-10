@@ -1,8 +1,8 @@
 
 %% Tratamento entrada
 clc; clear all; close all;
-%Name = '100m'; %arritmia, onda T negativa
-Name = '16265m';% sinusal
+Name = '100m'; %arritmia, onda T negativa
+%Name = '16265m';% sinusal
 %Name ='16272m'; %sinusal
 %Name ='16420m'; %sinusal 
 
