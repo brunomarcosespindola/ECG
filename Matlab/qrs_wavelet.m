@@ -157,9 +157,12 @@ grid on;
 a3_atenuado=[zeros(1,ordem) a3/3];
 t3=0:time_signal_s/length(a3_atenuado):time_signal_s-(time_signal_s/length(a3_atenuado));
 plot(t3,a3_atenuado,'b');
-plotbrowser('on');
-ylim([-1 1.5])
-xlim([0 10])
+xlabel('segundos')
+ylabel('mV')
+legend('original','a3 ajustado')
+%plotbrowser('on');
+%ylim([-1 1.5])
+xlim([6 8])
 
 
 %% encontra picos R sinal a3_atenuado

@@ -1,27 +1,19 @@
 clc; clear all; close all;
-% Name = '100m'; %arritmia, onda T negativa
-% Name = '101m'; %arritmia
-%Name = '102m'; %arritmia
-%Name = '103m'; %arritmia
-%Name = '104m'; %arritmia-RUIM
-%Name = '105m'; %arritmia
-%Name = '107m'; %arritmia-RUIM
-%Name = '108m'; %arritmia-RUIM
-%Name = '109m'; %arritmia
-%Name = '111m'; %arritmia
-% Name = '16265m';% sinusal
-% Name ='16272m'; %sinusal -possui um ruído forte no meio
-% Name ='16420m'; %sinusal
-% Name ='16483m'; %sinusal
-% Name ='16539m'; %sinusal
 %Name ='118e00m'; %NOISE STRESS
 
+%113 '119m' 207 e 208, 213, 215 217,'19088m' NAO FUNCIONA
 
 %% 
 Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
-Name= {'16265m','16272m','16420m','16483m','16539m'};% sinusal
-%Name={'16420m'};
-%Name={'103m_30m'};
+Name= {'112m','114m','115m','116m','117m','118m','121m','122m','123m','124m'};% arritmia
+Name= {'200m','201m','202m','203m','205m','209m','210m','212m','214m','219m'};% arritmia
+
+
+Name= {'16265m','16272m','16420m','16483m','16539m','16273m','16773m','16786m','16795m','17052m'};% sinusal
+Name= {'17453m','18177m','18184m'};% sinusal
+%Name={'19090m','19093m','19140m','19830m'}; %sinusal com falha
+
+%Name={'103m_30m,100m30m'};
 
 
 resultados=struct();
@@ -90,13 +82,22 @@ P1 = P2(1:L/2+1);
 P1(2:end-1) = 2*P1(2:end-1);
 
 f = Fs*(0:(L/2))/L;
-%subplot(2,1,2)
+
 % figure()
-% plot(f,P1)
+% subplot(1,2,2)
+% plot(f,(abs(P1)))
+% xlabel('Hz')
+% ylabel('mV')
 % grid on
-% title(['Espectro de frequencia do sinal pre-processado PA+PB: ',resultados(cont).Name])
+% title(['Domínio da frequência'])
 % xlim([0 50])
-% ylim([0 0.08])
+% subplot(1,2,1)
+% plot(t,y3)
+% title(['Domínio do tempo'])
+% xlim([0 2])
+% xlabel('segundos')
+% ylabel('mV')
+% grid on
 
 
 

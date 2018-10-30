@@ -12,14 +12,15 @@ Name = '100m'; %arritmia, onda T negativa
 %Name = '111m'; %arritmia
 %Name = '16265m';% sinusal
 %Name ='16272m'; %sinusal -possui um ruído forte no meio
-Name ='16420m'; %sinusal
-Name ='16483m'; %sinusal
-Name ='16539m'; %sinusal
+%Name ='16420m'; %sinusal
+%Name ='16483m'; %sinusal
+%Name ='16539m'; %sinusal
 %Name ='118e00m'; %NOISE STRESS
 
 %snr = 100;
 cont=0;
-for snr=51:-5:1
+for snr=51:-5:51
+%for snr=51:-5:1
     cont=cont + 1;
     
     infoName = strcat(Name, '.info');
@@ -91,16 +92,26 @@ for snr=51:-5:1
     y=y([151:end]);
     
     %% Decomposição, reconstrução, filtragem e downsampling
-    % wavelet='sym1';
-    %
-    % [a1,d1] = dwt(y,wavelet);
-    % [a2,d2] = dwt(a1,wavelet);
-    % [a3,d3] = dwt(a2,wavelet);
-    %
-    %
-    % reconst_a2 = idwt(a3,0*d3,wavelet,length(a2));
-    % reconst_a1 = idwt(reconst_a2,0*d2,wavelet,length(a1));
-    % reconst = idwt(reconst_a1,0*d1,wavelet,length(y));
+    wavelet='sym4';
+    
+    [a1,d1] = dwt(y,wavelet);
+    [a2,d2] = dwt(a1,wavelet);
+    [a3,d3] = dwt(a2,wavelet);
+    
+    
+    reconst_a2 = idwt(a3,0*d3,wavelet,length(a2));
+    reconst_a1 = idwt(reconst_a2,0*d2,wavelet,length(a1));
+    reconst = idwt(reconst_a1,0*d1,wavelet,length(y));
+    figure()
+    plot (t,y)
+    grid on
+    hold on
+    xlabel('segundos')
+    ylabel('mV')
+    
+    xlim([6 8])
+    plot (t,reconst)
+    legend('ECG','Sinal Reconstruído')
     %
     % y2 = filtfilt(SOS_PB,G_PB,reconst); %FILTRO PASSA BAIXAS
     % y2_downsample = downsample(y2,4); % REALIZA O DOWNSAMPLING
@@ -140,98 +151,124 @@ for snr=51:-5:1
     % title('Espectro de frequencia do FILTRO')
     % % xlim([0 100])
     % % ylim([0 0.08])
-    
+    y2=y;
     %% DENOISE------------------------------
-    % %%%apply Wavelet Transform
-    % [C,L]=wavedec(y2,1,'sym5');
-    % %[d1,d2,d3,d4,d5,d6,d7,d8]=detcoef(C,L,[1,2,3,4,5,6,7,8]);
-    % % %%%Denoise
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % cleanecg=wdencmp('gbl',C,L,'sym5',1,thr,sorh,keepapp);
+    %%%apply Wavelet Transform
+    [C,L]=wavedec(y2,1,'sym5');
+    %[d1,d2,d3,d4,d5,d6,d7,d8]=detcoef(C,L,[1,2,3,4,5,6,7,8]);
+    % %%%Denoise
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    cleanecg=wdencmp('gbl',C,L,'sym5',1,thr,sorh,keepapp);
     
     %% Comparação entre denoiseds
-    % wavelet='db1';
-    % ord=3;
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % clean1=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % wavelet='db2';
-    %
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % clean2=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % wavelet='db3';
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % clean3=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % wavelet='db4';
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % clean4=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % wavelet='db5';
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % clean5=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % wavelet='db6';
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % clean6=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % figure()
-    % plot (t,y,'k')
-    % hold on
-    % plot (t,clean1)
-    % plot (t,clean2)
-    % plot (t,clean3)
-    % plot (t,clean4)
-    % plot (t,clean5)
-    % plot (t,clean6)
-    % plotbrowser('on');
-    % grid on;
-    % xlim([0 10])
+    wavelet='db1';
+    ord=3;
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    clean1=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+    
+    wavelet='db2';
+    
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    clean2=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+    
+    wavelet='db3';
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    clean3=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+    
+    wavelet='db4';
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    clean4=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+    
+    wavelet='db5';
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    clean5=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+    
+    wavelet='db6';
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    clean6=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+    
+    figure()
+    plot (t,y,'k')
+    hold on
+    plot (t,clean1)
+    plot (t,clean2)
+    plot (t,clean3)
+    plot (t,clean4)
+    plot (t,clean5)
+    plot (t,clean6)
+    plotbrowser('on');
+    grid on;
+    xlim([0 2])
     
     %%
-    % wavelet='db4';
-    % ord=3;
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % compara1=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % wavelet='sym4';
-    % ord=3;
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % compara2=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % wavelet='haar';
-    % ord=3;
-    % [C,L]=wavedec(y2,ord,wavelet);
-    % [thr,sorh,keepapp]=ddencmp('den','wv',y2);
-    % compara3=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
-    %
-    % figure()
-    % plot (t,y,'k')
-    % hold on
-    % plot (t,compara1)
-    % plot (t,compara2)
-    % plot (t,compara3)
-    % plotbrowser('on');
-    % grid on;
-    % xlim([0 10])
-    %
+    wavelet='db4';
+    ord=3;
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    compara1=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
     
+    wavelet='sym4';
+    ord=3;
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    compara2=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
     
+    wavelet='haar';
+    ord=3;
+    [C,L]=wavedec(y2,ord,wavelet);
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    compara3=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
+    
+    figure()
+    plot (t,y,'k')
+    hold on
+    plot (t,compara1)
+    plot (t,compara2)
+    plot (t,compara3)
+    plotbrowser('on');
+    grid on;
+    xlim([0 10])
+    
+ %%   
+    wname='db4';
+    n=3;
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    compara1= wdencmp('gbl',y2,wname,n,thr,sorh,keepapp);
+   
+    wname='db4';
+    n=4;
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    compara2= wdencmp('gbl',y2,wname,n,thr,sorh,keepapp);
+    
+    wname='db4';
+    n=5;
+    [thr,sorh,keepapp]=ddencmp('den','wv',y2);
+    compara3= wdencmp('gbl',y2,wname,n,thr,sorh,keepapp);
+    
+    figure()
+    plot (t,y2,'r')
+    hold on
+    plot (t,compara1,'b')
+%     plot (t,compara2)
+%     plot (t,compara3)
+   % plotbrowser('on');
+   xlabel('segundos')
+   ylabel('mV')
+   legend('original','filtrado')
+    grid on;
+    xlim([6 8])
     
     %% comparação entre original e subamostrado
-    % figure()
-    % plot(t,y2)
-    % hold on;
-    % plot (t3_downsample,y3_downsample)
+%     figure()
+%     plot(t,y2)
+%     hold on;
+%     plot (t3_downsample,y3_downsample)
     
     %% plots
     % figure()

@@ -2,8 +2,8 @@
 %% Tratamento entrada
 clc; clear all; close all;
 Name = '100m'; %arritmia, onda T negativa
-%Name = '16265m';% sinusal
-%Name ='16272m'; %sinusal
+Name = '16265m';% sinusal
+Name ='16272m'; %sinusal
 %Name ='16420m'; %sinusal 
 
 
@@ -150,6 +150,9 @@ grid on;
 t3=t3+((desloc*ordem)/freqint(1,1));
 a3_atenuado= a3/3;
 plot(t3,a3_atenuado,'b');
+xlabel('segundos')
+ylabel('mV')
+legend('Original','A3 ajustado')
 plotbrowser('on');
 ylim([-1 1.5])
 xlim([0 10])
