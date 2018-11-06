@@ -5,16 +5,16 @@ clc; clear all; close all;
 
 %% 
 Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
-Name= {'112m','114m','115m','116m','117m','118m','121m','122m','123m','124m'};% arritmia
-Name= {'200m','201m','202m','203m','205m','209m','210m','212m','214m','219m'};% arritmia
+%Name= {'112m','114m','115m','116m','117m','118m','121m','122m','123m','124m'};% arritmia
+%Name= {'200m','201m','202m','203m','205m','209m','210m','212m','214m','219m'};% arritmia
 
 
 Name= {'16265m','16272m','16420m','16483m','16539m','16273m','16773m','16786m','16795m','17052m'};% sinusal
-Name= {'17453m','18177m','18184m'};% sinusal
+%Name= {'17453m','18177m','18184m'};% sinusal
 %Name={'19090m','19093m','19140m','19830m'}; %sinusal com falha
 
 %Name={'103m_30m,100m30m'};
-
+Name= {'100m'}
 
 resultados=struct();
 %%
@@ -68,7 +68,15 @@ y3 = filtfilt(SOS_PB,G_PB,y); %FILTRAR COM O PB SEM PASSAR PELA DECOMPOSICAO
 y3_downsample = downsample(y3,4);
 t3_downsample=0:time_signal_s/length(y3_downsample):time_signal_s-(time_signal_s/length(y3_downsample));%cria vetor de tempo do downsampling
 
-
+% figure()
+% plot(t,y,'b')
+% xlabel('segundos')
+% ylabel('mV')
+% grid on
+% hold on
+% plot(t,y3,'r')
+% legend('original','filtrado')
+% xlim([6 8])
 %% TRANSFORMADA DE FOURIER
 
 L=length(y3_downsample);
@@ -289,7 +297,7 @@ plot(t3_downsample(posicao_R), y3_downsample(posicao_R),'x')% marca onda R
 plot(t3_downsample(posicao_S), y3_downsample(posicao_S),'vg')% marca onda S
 plot(t3_downsample(posicao_T), y3_downsample(posicao_T),'xr')% marca onda T
 legend('ECG','onda P','onda Q','onda R','onda S','onda T')
-xlim([2 8])
+%xlim([2 8])
 y_alerta=repmat(m/2,1,length(alerta));
 text(alerta,y_alerta,'Alerta')
 
@@ -304,7 +312,37 @@ plot(t(posicao_Q*4 -2),y(posicao_Q*4 -2), 'vm');% marca onda Q
 plot(t(posicao_R*4 -2),y(posicao_R*4 -2), 'x');% marca onda R
 plot(t(posicao_S*4 -2),y(posicao_S*4 -2), 'vg');% marca onda S
 plot(t(posicao_T*4 -2),y(posicao_T*4 -2), 'xr');% marca onda T
-%xlim([0 10])
+%xlim([0 10]
+
+%% Diagnostico
+
+if resultados(cont).correlacao>0.2
+    resultados(cont).sinusal='sinal pode ser sinusal';   
+else
+    resultados(cont).sinusal='sinal não sinusal';  
+end
+
+if resultados(cont).intervalo_QS_ms>100
+    resultados(cont).bloqueio_ramo='Possível bloqueio de ramo';
+else
+     resultados(cont).bloqueio_ramo='não';
+end
+
+if resultados(cont).Media_bpm>100
+    resultados(cont).Ritmo_cardiaco='Arritmia:Taquicardia';
+elseif resultados(cont).Media_bpm<50
+    resultados(cont).Ritmo_cardiaco='Arritmia:Bradicardia';
+else
+    
+    if resultados(cont).n_alertas>0
+        resultados(cont).Ritmo_cardiaco=['Arritmia: Possui ',num2str(resultados(cont).n_alertas),' alertas'];
+    else
+        resultados(cont).Ritmo_cardiaco='Batimentos Regulares';
+    end
+end
+    
+
+
 end
 %%
 for ii=1:length(resultados)
