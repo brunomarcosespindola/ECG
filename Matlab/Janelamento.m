@@ -1,20 +1,26 @@
 clc; clear all; close all;
 %Name ='118e00m'; %NOISE STRESS
 
-%113 '119m' 207 e 208, 213, 215 217,'19088m' NAO FUNCIONA
 
 %% 
-Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
+%Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m'};% arritmia
 %Name= {'112m','114m','115m','116m','117m','118m','121m','122m','123m','124m'};% arritmia
 %Name= {'200m','201m','202m','203m','205m','209m','210m','212m','214m','219m'};% arritmia
+%Name= {'113m','213m','215m','217m'};% arritmia
+
+%% TODOS SINAIS DE ARRITMIA
+Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m','112m','114m','115m','116m','117m','118m','121m','122m','123m','124m','200m','201m','202m','203m','205m','209m','210m','212m','214m','219m','113m','213m','215m','217m'};
 
 
-Name= {'16265m','16272m','16420m','16483m','16539m','16273m','16773m','16786m','16795m','17052m'};% sinusal
-%Name= {'17453m','18177m','18184m'};% sinusal
+%% ---- sinusal
+%Name= {'16265m','16272m','16420m','16483m','16539m','16273m','16773m','16786m','16795m','17052m','17453m','18177m','18184m'};
 %Name={'19090m','19093m','19140m','19830m'}; %sinusal com falha
+%% 
 
-%Name={'103m_30m,100m30m'};
-Name= {'100m'}
+%SINAIS MAIORES QUE 1 MIN
+%Name={'116m_30min'}
+%Name={'103m_30m','100m30m','112m_30m'};
+
 
 resultados=struct();
 %%
@@ -261,18 +267,23 @@ dif_intervalo=intervalo_aux - intervalo_total(1:end-1);
 t_dif=Rx_total(3:end);
 
 pontos_de_alerta=find(dif_intervalo>0.1);
-
+if length(pontos_de_alerta)>0
+    if pontos_de_alerta(1)==1;
+        pontos_de_alerta=pontos_de_alerta(2:end);
+    end
+end
 alerta=t_dif(pontos_de_alerta -1);
-
 resultados(cont).n_alertas=length(alerta);
+
 %% ----------------INTERVALO QS
 if (length(Sx_total)> length(Qx_total));
-    vetorQS=Sx_total([2:length(Qx_total)])-Qx_total;
+    vetorQS=Sx_total([2:length(Qx_total)+1])-Qx_total;
     % Q_S=sum(vetorQS)/length(Qx_total); %calcula tempo do intervalo QS
 else (length(Sx_total)< length(Qx_total));   
        vetorQS=Sx_total - Qx_total([1:length(Sx_total)]);
     % Q_S=sum(vetorQS)/length(Qx_total);     
 end
+
 resultados(cont).intervalo_QS_ms=median(vetorQS)*1000;
 resultados(cont).variancia_QS_ms=var(vetorQS);
 %string = ['intervalo QS= ',num2str(Q_S*1000),' ms'];disp(string);
