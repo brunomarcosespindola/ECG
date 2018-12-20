@@ -112,6 +112,10 @@ for snr=51:-5:51
     xlim([6 8])
     plot (t,reconst)
     legend('ECG','Sinal Reconstruído')
+    
+    
+    correlacao_cruzada=100*(sum(y.*reconst))/sqrt(sum(y.^2)*sum(reconst.^2))
+
     %
     % y2 = filtfilt(SOS_PB,G_PB,reconst); %FILTRO PASSA BAIXAS
     % y2_downsample = downsample(y2,4); % REALIZA O DOWNSAMPLING
@@ -161,34 +165,34 @@ for snr=51:-5:51
     cleanecg=wdencmp('gbl',C,L,'sym5',1,thr,sorh,keepapp);
     
     %% Comparação entre denoiseds
-    wavelet='db1';
+    wavelet='sym1';
     ord=3;
     [C,L]=wavedec(y2,ord,wavelet);
     [thr,sorh,keepapp]=ddencmp('den','wv',y2);
     clean1=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
     
-    wavelet='db2';
+    wavelet='sym2';
     
     [C,L]=wavedec(y2,ord,wavelet);
     [thr,sorh,keepapp]=ddencmp('den','wv',y2);
     clean2=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
     
-    wavelet='db3';
+    wavelet='sym3';
     [C,L]=wavedec(y2,ord,wavelet);
     [thr,sorh,keepapp]=ddencmp('den','wv',y2);
     clean3=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
     
-    wavelet='db4';
+    wavelet='sym4';
     [C,L]=wavedec(y2,ord,wavelet);
     [thr,sorh,keepapp]=ddencmp('den','wv',y2);
     clean4=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
     
-    wavelet='db5';
+    wavelet='sym5';
     [C,L]=wavedec(y2,ord,wavelet);
     [thr,sorh,keepapp]=ddencmp('den','wv',y2);
     clean5=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
     
-    wavelet='db6';
+    wavelet='sym6';
     [C,L]=wavedec(y2,ord,wavelet);
     [thr,sorh,keepapp]=ddencmp('den','wv',y2);
     clean6=wdencmp('gbl',C,L,wavelet,ord,thr,sorh,keepapp);
@@ -205,7 +209,13 @@ for snr=51:-5:51
     plotbrowser('on');
     grid on;
     xlim([0 2])
-    
+ %%   
+    correlacao_cruzada_denoising1=100*(sum(y.*clean1))/sqrt(sum(y.^2)*sum(clean1.^2))
+    correlacao_cruzada_denoising2=100*(sum(y.*clean2))/sqrt(sum(y.^2)*sum(clean2.^2))
+    correlacao_cruzada_denoising3=100*(sum(y.*clean3))/sqrt(sum(y.^2)*sum(clean3.^2))
+    correlacao_cruzada_denoising4=100*(sum(y.*clean4))/sqrt(sum(y.^2)*sum(clean4.^2))
+    correlacao_cruzada_denoising5=100*(sum(y.*clean5))/sqrt(sum(y.^2)*sum(clean5.^2))
+    correlacao_cruzada_denoising6=100*(sum(y.*clean6))/sqrt(sum(y.^2)*sum(clean6.^2))
     %%
     wavelet='db4';
     ord=3;

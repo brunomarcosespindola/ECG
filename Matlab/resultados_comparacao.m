@@ -9,9 +9,19 @@ clc; clear all; close all;
 %Name= {'113m','213m','215m','217m'};% arritmia
 
 %% TODOS SINAIS DE ARRITMIA
-%Name= {'100m','101m','102m','103m','104m','105m','107m','108m','109m','111m','112m','114m','115m','116m','117m','118m','121m','122m','123m','124m','200m','201m','202m','203m','205m','209m','210m','212m','214m','219m','113m','213m','215m','217m'};
-Name= {'100m'}
+%Name= {'100m','101m','102m','103m','104m','105m','107m','109m','111m','112m','114m','115m','116m','117m','118m','121m','122m','123m','124m','200m','201m','202m','203m','205m','209m','210m','212m','214m','219m','113m','213m','215m','217m'};
 
+Name= {'234m'}
+%Name= {'115m'}
+%Name= {'123m'}
+%Name= {'209m'}
+%Name= {'100m'}
+
+%Name= {'100m30m'}
+%Name= {'209m30m'}
+%Name= {'123m30m'}
+Name= {'115m30m'}
+Name= {'234m30m'}
 %% ---- sinusal
 %Name= {'16265m','16272m','16420m','16483m','16539m','16273m','16773m','16786m','16795m','17052m','17453m','18177m','18184m'};
 %Name={'19090m','19093m','19140m','19830m'}; %sinusal com falha
@@ -71,8 +81,11 @@ y=filter(FIR_HP_300,[sinal_original zeros(1,150)]);%
 y=y([151:end]);
 
 y3 = filtfilt(SOS_PB,G_PB,y); %FILTRAR COM O PB SEM PASSAR PELA DECOMPOSICAO
- y3_downsample = downsample(y3,4);%% downsample
- t3_downsample=0:time_signal_s/length(y3_downsample):time_signal_s-(time_signal_s/length(y3_downsample));%cria vetor de tempo do downsampling
+y3_downsample = downsample(y3,4);%% downsample para usar na transformada de fourier
+ %t3_downsample=0:time_signal_s/length(y3_downsample):time_signal_s-(time_signal_s/length(y3_downsample));%cria vetor de tempo do downsampling
+
+correlacao_cruzada=100*(sum(y.*y3))/sqrt(sum(y.^2)*sum(y3.^2))
+
 
 % figure()
 % plot(t,y,'b')
@@ -357,24 +370,31 @@ end
 
 
 %% COMPARA RESULTADO PHYSIONET
-%faz a leitura do arquivo e converte o tempo localizado em segundos
-tabela=importdata('100.txt');
+%%faz a leitura do arquivo e converte o tempo localizado em segundos
+Name_anotacao = strcat(char(Name(cont)), '.txt');
+tabela=importdata(Name_anotacao);
 R_physionet=tabela.textdata(:,1);
 R_physionet=R_physionet(2:end)';
 anotacao=tabela.textdata(:,3);
-anotacao=anotacao(2:end)';
+anotacao=anotacao(3:end)';
 clear tabela;
 [minutos,segundos]=strtok(R_physionet,':');
 segundos = regexprep(segundos,':','');
 minutos=str2double(minutos);
 segundos=str2double(segundos);
 tempo=(minutos*60)+segundos;
-%%
-
 tempo=tempo(2:end);
 
-diferenca=Rx_total-tempo;
-media_dif=mean(diferenca)
+alerta_physionet=tempo(find(char(anotacao')~='N'))
+alerta_algoritmo=alerta
+
+%%
+
+% diferenca=abs(tempo-Rx_total);
+% media_dif=mean(diferenca)
+% variancia_dif=var(diferenca)
+QRS_NO_SINAL=length(tempo)
+QRS_ENCONTRADOS=length(Rx_total)
 
 end
 %%
